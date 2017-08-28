@@ -61,11 +61,11 @@ class App extends Component {
           export SOLC_FLAGS=--optimize<br />
           dapp build<br />
         </pre>
-        <p>Then, set variables for the account you'll use and how much wei per gas you'll pay. 1 GWei is the cheapest. We're passing 1,500,000 gas, although it will take about half that.</p>
+        <p>Then, set variables for the account you'll use and how much wei per gas you'll pay. 1 GWei is the cheapest. We're passing 1,000,000 gas, although it will take a bit less than that.</p>
         <pre>
           export ETH_FROM=[your unlocked account]<br />
           export ETH_GAS_PRICE=1000000000<br />
-          dapp create Poker -G 1500000<br />
+          dapp create Poker -G 1000000<br />
         </pre>
         <p>
           After <strong>dapp</strong> deploys the poker, the last line of output will be the poker's address in the blockchain. Save this address.
