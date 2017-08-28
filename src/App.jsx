@@ -25,12 +25,16 @@ class App extends Component {
           You will need an Ethereum client like Parity or Geth running with an unlocked account.
         </p>
         <p>You'll also need Node 6 or above.</p>
+        <pre>
+          curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -<br />
+          sudo apt-get install -y nodejs<br />
+        </pre>
         <h2>Installing DappHub's development tools</h2>
         <pre>
           curl https://nixos.org/nix/install | sh<br />
           nix-channel --add https://nix.dapphub.com/pkgs/dapphub<br />
           nix-channel --update<br />
-          nix-env -iA dapphub.{'{dapp,seth,solc}'}<br />
+          nix-env -iA dapphub.{'{dapp,seth,solc,bc,jshon}'}<br />
         </pre>
         <p>
           More info at <a target="_blank" rel="noopener noreferrer" href="http://dapp.tools">dapp.tools</a>
