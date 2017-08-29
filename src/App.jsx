@@ -61,7 +61,7 @@ class App extends Component {
           export SOLC_FLAGS=--optimize<br />
           dapp build<br />
         </pre>
-        <p>Then, set variables for the account you'll use and how much wei per gas you'll pay. 1 GWei is the cheapest. We're passing 1,000,000 gas, although it will take a bit less than that.</p>
+        <p>Then, set variables for the account you'll use and how much wei per gas you'll pay. 1 GWei is just about as cheap as you can go. We're passing 1,000,000 gas, although it will take a bit less than that.</p>
         <pre>
           export ETH_FROM=[your unlocked account]<br />
           export ETH_GAS_PRICE=1000000000<br />
