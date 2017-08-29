@@ -46,7 +46,7 @@ class App extends Component {
           <strong>setzer</strong> is our tool to handle feeds. It's a collection of scripts built on top of <strong>seth</strong>.
         </p>
         <pre>
-          git clone https://github.com/makerdao/setzer<br />
+          dapp clone makerdao/setzer<br />
           cd setzer<br />
           sudo make link<br />
         </pre>
@@ -56,7 +56,7 @@ class App extends Component {
         </p>
         <p>First, download <strong>poker</strong> and build it.</p>
         <pre>
-          git clone https://github.com/makerdao/poker --recursive<br />
+          dapp clone makerdao/poker<br />
           cd poker<br />
           export SOLC_FLAGS=--optimize<br />
           dapp build<br />
