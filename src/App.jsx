@@ -35,7 +35,6 @@ class App extends Component {
           <li>
             Node 6 or above.
           </li>
-          <li></li>
         </ul>
         <h3>Installing DappHub's development tools</h3>
         <pre>
