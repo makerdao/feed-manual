@@ -22,89 +22,125 @@ class App extends Component {
       <div>
         <h1>Running a price feed</h1>
         <p>
-          You will need an Ethereum client like Parity or Geth running with an unlocked account.
-        </p>
-        <p>You'll also need Node 6 or above.</p>
-        <h2>Installing DappHub's development tools</h2>
-        <pre>
-          curl https://nixos.org/nix/install | sh<br />
-          nix-channel --add https://nix.dapphub.com/pkgs/dapphub<br />
-          nix-channel --update<br />
-          nix-env -iA dapphub.{'{dapp,seth,solc}'}<br />
-        </pre>
-        <p>
-          More info at <a target="_blank" rel="noopener noreferrer" href="http://dapp.tools">dapp.tools</a>
-        </p>
-        <h2>
-          Installing setzer
-        </h2>
-        <p>
-          <strong>setzer</strong> is our tool to handle feeds. It's a collection of scripts built on top of <strong>seth</strong>.
-        </p>
-        <pre>
-          git clone https://github.com/makerdao/setzer<br />
-          cd setzer<br />
-          sudo make link<br />
-        </pre>
-        <h2>Deploying a poker</h2>
-        <p>
-          A <strong>poker</strong> is a <strong>ds-cache</strong> that also updates a <strong>medianizer</strong>. This is the smart contract that you'll be updating regularly.
-        </p>
-        <p>First, download <strong>poker</strong> and build it.</p>
-        <pre>
-          git clone https://github.com/makerdao/poker --recursive<br />
-          cd poker<br />
-          export SOLC_FLAGS=--optimize<br />
-          dapp build<br />
-        </pre>
-        <p>Then, set variables for the account you'll use and how much wei per gas you'll pay. 1 GWei is the cheapest. We're passing 1,500,000 gas, although it will take about half that.</p>
-        <pre>
-          export ETH_FROM=[your unlocked account]<br />
-          export ETH_GAS_PRICE=1000000000<br />
-          dapp create Poker -G 1500000<br />
-        </pre>
-        <p>
-          After <strong>dapp</strong> deploys the poker, the last line of output will be the poker's address in the blockchain. Save this address.
-        </p>
-        <h2>
-          Updating your feed
-        </h2>
-        <p>
-          The simplest way to update your feed is to run the following.
-        </p>
-        <pre>
-          export POKER=[address of contract you deployed]<br />
-          export MEDIANIZER=0x729D19f657BD0614b4985Cf1D82531c67569197B<br />
-          export PRICE=$(setzer price cryptocompare)<br />
-          export EXPIRES=$(date +%s -d'+6 hour')<br />
-          setzer poker "$POKER" "$MEDIANIZER" "$PRICE" "$EXPIRES"<br />
-        </pre>
-        <p>
-          If everything went well, you will have updated your feed to the current price according to Cryptocompare, set it to expire in 6 hours, and poked a medianizer.
+          These are the steps required to deploy your own <a href="https://github.com/makerdao/price-feed" rel="noopener noreferrer" target="_blank">price-feed</a> and run a bot that updates its price regularly.
         </p>
         <p>
-          Of course, your feed is not currently part of the medianizer. You will have to get in touch with us for that.
+          <strong>NOTE: This guide has been tested with Ubuntu 16.04 or up.</strong>
         </p>
-        <h2>Setting up a cron job</h2>
-        <p>
-          There are several ways to update your feed periodically. We expect people will come up with their own strategies. Here we propose a very simple way.
-        </p>
-        <p>
-          There's a script inside <strong>setzer</strong> called <strong>update</strong> that you can call in a cron job. Just set some environment variables or pass them to the script and call it every few minutes.
-        </p>
-        <pre>
-        */3 * * * * SPREAD=1 ETH_GAS_PRICE=4000000000 ETH_FROM=[your account] SOURCE=cryptocompare POKER=[your poker feed] MED=0x729d19f657bd0614b4985cf1d82531c67569197b bash -lc /path/to/setzer/scripts/update >> /path/to/update.log 2>&1
-        </pre>
-        <p>
-          This cron job does the following:
-        </p>
+        <h3>Prerequisites</h3>
         <ul>
-          <li>Sets a spread of 1%. It will only update if new price deviates from 1%.</li>
-          <li>Gas price of 4 GWei.</li>
-          <li>Source price is Cryptocompare. You can run <strong>setzer price ls</strong> and pick a different one (in lowercase).</li>
-          <li>Runs every 3 minutes.</li>
-          <li>Logs outputs to a log file.</li>
+          <li>
+            Ethereum client like Parity or Geth running with an unlocked account.
+          </li>
+          <li>
+            Node 6 or above.
+          </li>
+          <li></li>
         </ul>
+        <h3>Installing DappHub's development tools</h3>
+        <pre>
+          $ curl https://nixos.org/nix/install | sh<br />
+          $ . $HOME/.nix-profile/etc/profile.d/nix.sh<br />
+          $ nix-channel --add https://nix.dapphub.com/pkgs/dapphub<br />
+          $ nix-channel --update<br />
+          $ nix-env -iA dapphub.{'{dapp,seth,solc,jshon,bc}'}<br />
+        </pre>
+        <p>
+          More info at <a target="_blank" rel="noopener noreferrer" href="https://dapp.tools">dapp.tools</a>
+        </p>
+        <h3>
+          Installing setzer
+        </h3>
+        <p>
+        <a target="_blank" rel="noopener noreferrer" href="https://github.com/makerdao/setzer">setzer</a> is our tool to handle feeds.
+        </p>
+        <pre>
+          $ sudo apt install -y make<br />
+          $ git clone https://github.com/makerdao/setzer<br />
+          $ cd setzer<br />
+          $ sudo make link<br />
+        </pre>
+        <h3>Deploying your price feed</h3>
+        <p>
+          A <a target="_blank" rel="noopener noreferrer" href="https://github.com/makerdao/price-feed">price feed</a> is the contract you'll be interacting with. We provide a FeedFactory that will create a price-feed for you.
+        </p>
+        <p>
+          FeedFactory is deployed at <a target="_blank" rel="noopener noreferrer" href="https://etherscan.io/address/0x435ad5cae6ea3e065ce540464366b71fba8f0c52">0x435AD5CAE6eA3e065ce540464366b71Fba8f0c52</a>. You will send a transaction to it and it will create your price-feed.
+        </p>
+        <pre>
+          $ seth send 0x435AD5CAE6eA3e065ce540464366b71Fba8f0c52 --guess "create()(address)" -F [YOUR ACCOUNT] -G 700000 -P $(seth --to-wei 1 gwei)
+        </pre>
+        <p>
+          This command sends a transaction to the FeedFactory's "create()" method, sending 700,000 gas, with a price of 1 gwei per gas. After it finishes, seth will print out the address of your price-feed.
+        </p>
+        <h3>Setting up setzer</h3>
+        <p>
+          setzer expects a <strong>/etc/setzer.conf</strong> file that looks like this:
+        </p>
+        <pre>
+          export ETH_FROM="YOUR ACCOUNT"<br />
+          export SETZER_FEED="YOUR PRICE-FEED ADDRESS"<br />
+          export SETZER_MEDIANIZER="0x729D19f657BD0614b4985Cf1D82531c67569197B"<br />
+          export SETZER_SOURCES="LIST OF PRICE SOURCES"<br />
+        </pre>
+        <p>
+          The medianizer address is our current contract that reads several feeds and saves the median, which is then used as our official price source.
+        </p>
+        <p>
+          To select a list of price sources, run:
+        </p>
+        <pre>
+          $ setzer price ls
+        </pre>
+        <p>
+        You will see a list of sources along with their price. Select at least two and add their names (in lowercase) to <strong>SETZER_SOURCES</strong>, for example:
+        </p>
+        <pre>
+          export SETZER_SOURCES="etherscan gdax gemini poloniex"
+        </pre>
+        <h3>
+          Testing setzer bot
+        </h3>
+        <p>
+          Once <strong>setzer</strong> is configured, it's time to test it. Run the following command:
+        </p>
+        <pre>
+          $ setzer bot
+        </pre>
+        <p>
+          It will initialize with your current configuration. The first time, your price-feed is empty so it will update with the new price.
+        </p>
+        <p>
+          Since you ran <strong>setzer bot</strong>, it will ask for confirmation before submitting a transaction. When prompted, select <strong>Y</strong> or <strong>YES</strong> to send the transaction. Wait for your transaction to be mined. If it's not mined in 90 seconds, setzer will try to resend with higher gas price. Accept the transaction until it passes.
+        </p>
+        <p>
+          After the price is set, <strong>setzer bot</strong> will continue to run, but only update if the price stored in the blockchain deviates from a certain percentage (+- 1% by default). At this point, you can stop setzer with <strong>Ctrl + C</strong>.
+        </p>
+        <h3>
+          Adding your feed to the medianizer
+        </h3>
+        <p>
+          At this point you are updating your feed, but that's it. It's not yet part of of our official list of feeds. And the medianizer does not take it into account to calculate its price.
+        </p>
+        <p>
+          For that you need to contact us. Find us in <a target="_blank" rel="noopener noreferrer" href="https://chat.makerdao.com/channel/general">Maker Chat</a> and propose running a feed. We value members of the community helping with this task, but please, contact us first!
+        </p>
+        <h3>Running setzer bot automatically</h3>
+        <p>
+          Once you tried <strong>setzer bot</strong> and it's working, you can run it without user intervention. The command is:
+        </p>
+        <pre>
+          $ setzer bot --auto
+        </pre>
+        <p>
+          You can set your OS to run it automatically on boot, or have it run in the background. One suggestion is:
+        </p>
+        <pre>
+          nohup setzer bot --auto > /path/to/bot.log 2>&1 &
+        </pre>
+        <p>
+          And that's it!
+        </p>
         <p>
           Join us in the <strong>#feeds</strong> channel at <a target="_blank" rel="noopener noreferrer" href="https://chat.makerdao.com/channel/feeds">Maker Chat</a> if you have any questions.
         </p>
